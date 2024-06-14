@@ -1,2 +1,3 @@
 # DIMARK
-Dynamic Intertemporal MARKet Analysis
+
+Krótki opis biblioteki.
