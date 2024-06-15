@@ -10,7 +10,7 @@ Faculty of Economic Sciences and Management
 """
 import numpy as np
 
-def ras_method(products, sources, tol=1e-5, max_iter=10000):
+def ras_method(products, sources, initialA = [], tol=1e-5, max_iter=10000):
     """
     Rekonstruuje macierz na podstawie zadanych sum wierszy i kolumn za pomocą metody RAS.
 
@@ -24,8 +24,10 @@ def ras_method(products, sources, tol=1e-5, max_iter=10000):
     products = np.array(products)
     sources = np.array(sources)
     m, n = len(products), len(sources)
-    A = np.ones((m, n))  # Początkowa macierz z wartościami równymi 1
-
+    if initialA == []:
+        A = np.ones((m, n))  # Początkowa macierz z wartościami równymi 1
+    else:
+        A = initialA
     for iteration in range(max_iter):
         # Skaluje wiersze
         for i in range(m):
