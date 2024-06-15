@@ -160,3 +160,5 @@ def product_distribution(matrix, products=[]):
         ret.append(diff)
         ret.append(diff2)
     return ret
+
+
