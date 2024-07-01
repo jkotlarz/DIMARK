@@ -142,6 +142,30 @@ def resolve_allocation_matrix(sources,product,matrix,maxiterations=1e4):
 
 
 def product_distribution(matrix, products=[]):
+    """
+    Calculates the sum of the products for each column in the given matrix and optionally compares these sums 
+    with the expected product values.
+
+    Parameters:
+    matrix (list of lists or 2D array): A 2D list or array where each element matrix[s][p] corresponds to the value at row s and column p.
+    products (list, optional): A list representing the expected values for each column in the matrix. Default is an empty list.
+
+    Returns:
+    list: A list containing the sums of the products for each column. If the expected product values are provided,
+          the returned list also includes the differences between the calculated sums and the expected values,
+          as well as the relative differences.
+
+    Example:
+    >>> matrix = [
+    ...     [1, 2, 3],
+    ...     [4, 5, 6],
+    ...     [7, 8, 9]
+    ... ]
+    >>> products = [12, 15, 18]
+    >>> result = product_distribution(matrix, products)
+    >>> print(result)
+    [[12.0, 15.0, 18.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+    """
     p_n = len(matrix[0])
     products_sum=[]
     for p in range(p_n):
