@@ -67,24 +67,43 @@ def functionvalue(a, x, functiontype="lin"):
         return f"ERR: Unsupported function type '{functiontype}'. Supported types are 'lin' and 'poly'."
 
 
-def market_equilibrium(supp, demd):
+def market_equilibrium(supp, demd, maxdif=1.,maxiter=1e3):
     """
     Finds the market equilibrium points where the supply and demand polynomials are equal.
 
     Parameters:
     supp (list or array): Coefficients of the supply polynomial.
     demd (list or array): Coefficients of the demand polynomial.
+    maxdif (float): Maximum prices difference on equilibrium.
+    maxiter (int): Maximum number of iterations
 
     Returns:
     tuple: A tuple containing:
-        - real_roots (array): The x values where the supply and demand polynomials are equal.
-        - supp_values (array): The values of the supply polynomial at the equilibrium points.
+        - quantity in equilibrium
+        - price in equilibrium
+        - final iteration step
+        - final difference in prices between demand and supply in returned quantity
+        - number of iterations
     """
-    diff_coeffs = np.polysub(supp, demd)
-    roots = np.roots(diff_coeffs[::-1])
-    real_roots = roots[np.isreal(roots)].real
-    supp_values = np.polyval(supp[::-1], real_roots)
+
+    delta = 1.
+    q = [5.0]
+    i=0
+    sup = functionvalue(supp, q, "poly")
+    dem = functionvalue(demd, q, "poly")
     
-    return real_roots, supp_values
-
-
+    while (np.abs(sup[0]-dem[0]) > maxdif) and (i<maxiter):
+        i += 1
+        q.append(q[0]+delta)
+        sup = functionvalue(supp, q, "poly")
+        dem = functionvalue(demd, q, "poly")
+        dy = np.abs(sup[0]-dem[0])
+        dy2 = np.abs(sup[1]-dem[1])
+        if (dy2 < dy):
+            q=[q[0]+delta]
+        else:
+            q=[q[0]-delta]
+        if (sup[0]-dem[0])*(sup[1]-dem[1]) < 0:
+            delta = delta/2
+    return(q[0],(sup[0]+dem[0])*0.5,delta,np.abs(sup[0]-dem[0]),i)
+    
