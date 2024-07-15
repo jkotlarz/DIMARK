@@ -44,7 +44,7 @@ def market_equilibrium(supp, demd, maxdif=1.,maxiter=1e3):
 
     return(q[0],(sup[0]+dem[0])*0.5,delta,np.abs(sup[0]-dem[0]),i)    
 
-def surplus(a,equilibrium_q):
+def surplus(a,equilibrium_q, equilibrium_p=0):
     """
     Computes the surplus by finding the difference between the area under the
     polynomial curve and the area of the rectangle formed by the equilibrium price
@@ -57,7 +57,12 @@ def surplus(a,equilibrium_q):
     Returns:
     float: Surplus calculated as the absolute difference between the integral and the rectangle area.
     """
-    equilibrium_p = functionvalue(a, [equilibrium_q])[0]
+    if equilibrium_p == 0:
+        equilibrium_p = functionvalue(a, [equilibrium_q])[0]
     rectangle = equilibrium_p*equilibrium_q
     integral = integrate_poly(a, 0, equilibrium_q)
     return np.abs(integral - rectangle)
+
+
+def price_elasticity_of_supply(p,q,dp_over_dq):
+    return p/(q*dp_over_dq)
