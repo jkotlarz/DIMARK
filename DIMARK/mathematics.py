@@ -146,3 +146,69 @@ def pearson_correlation(x, y):
     correlation_coefficient = numerator / (denominator_x * denominator_y)
         
     return correlation_coefficient
+
+def smooth_array(a, window_size=3):
+    """
+    Smooths the array `a` using a moving average filter with the specified `window_size`.
+    The output array will have the same length as the input array.
+    
+    Parameters:
+    - a: The input array (list or numpy array) to smooth
+    - window_size: The size of the moving average window, default is 3
+    
+    Returns:
+    - A smoothed array with the same length as the input array
+    """
+    a = np.array(a)  # Convert to numpy array if it is not already
+    if window_size < 1:
+        raise ValueError("Window size must be greater than or equal to 1")
+    
+    # Apply convolution with 'same' mode to maintain the same length
+    smooth_a = np.convolve(a, np.ones(window_size)/window_size, mode='same')
+    
+    return smooth_a
+
+def consecutive_differences(v):
+    """
+    Calculates the difference between consecutive elements in the array `v`.
+    
+    Parameters:
+    - v: The input array (list or numpy array)
+    
+    Returns:
+    - An array of differences between consecutive elements of `v`
+    """
+    v = np.array(v)  # Convert to numpy array if it is not already
+    
+    # Calculate the differences between consecutive elements
+    differences = np.diff(v)
+    differences = np.insert(differences, 0, v[0])
+
+    
+    return differences
+
+def construct_v(dv):
+    """
+    Constructs the array v from the array dv such that:
+    - v[0] = dv[0]
+    - v[n+1] = v[n] + dv[n] for n >= 0
+    
+    Parameters:
+    - dv: The input array (list or numpy array) of differences
+    
+    Returns:
+    - The constructed array v
+    """
+    dv = np.array(dv)  # Convert to numpy array if it is not already
+    
+    # Initialize v with the same length as dv plus one for the starting value
+    v = np.zeros(len(dv) + 1)
+    
+    # Set the first element
+    v[0] = dv[0]
+    
+    # Compute the rest of the elements
+    for n in range(1, len(dv) + 1):
+        v[n] = v[n - 1] + dv[n - 1]
+    
+    return v

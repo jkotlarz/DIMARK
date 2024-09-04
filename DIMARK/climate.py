@@ -1,6 +1,7 @@
 # DIMARK/climate.py
 
 import numpy as np
+import pandas as pd 
 
 def calculate_npp_coefficient(avg_temp, annual_precipitation, CO2_concentration, growing_season_length):
     """
@@ -23,10 +24,10 @@ def calculate_npp_coefficient(avg_temp, annual_precipitation, CO2_concentration,
     weight_season = 0.25
     
     # Normalization of input values (approximate, reference values can be adjusted)
-    norm_temp = avg_temp / 30.0  # Assuming 30°C is the optimal temperature
-    norm_precipitation = annual_precipitation / 1000.0  # Assuming 1000 mm of precipitation is optimal
+    norm_temp = avg_temp / 7.0  # Assuming 7°C is the optimal temperature
+    norm_precipitation = annual_precipitation / 800.0  # Assuming 800 mm of precipitation is optimal
     norm_CO2 = CO2_concentration / 400.0  # Assuming 400 ppm CO2 is a reference level
-    norm_season = growing_season_length / 180.0  # Assuming 180 days is the optimal growing season
+    norm_season = growing_season_length / 250.0  # Assuming 150 days is the optimal growing season
     
     # Calculate the NPP coefficient
     npp_coefficient = (
@@ -43,3 +44,27 @@ def calculate_npp_coefficient(avg_temp, annual_precipitation, CO2_concentration,
 # 'ro' - matrix representing the average density of wood volume per hectare for species at specific ages
 # 'h' - matrix representing the shares of areas covered by species at specific ages that are harvested
 
+def NPP_climate(file_path, c_NPP):
+    """
+    Reads the CSV file from the given path, multiplies values in columns ending with 'dv' by c_NPP,
+    and returns these columns as a DataFrame.
+    
+    Parameters:
+    - file_path: The path to the NPP CSV file
+    - c_NPP: The multiplier value to apply to columns ending with 'dv'
+    
+    Returns:
+    - A DataFrame containing the processed columns
+    """
+    # Read the CSV file
+    df = pd.read_csv(file_path)
+    
+    # Identify columns ending with 'dv'
+    dv_columns = [col for col in df.columns if col.endswith('dv')]
+    
+    # Multiply the values in these columns by c_NPP
+    for col in dv_columns:
+        df[col] = df[col] * c_NPP
+    
+    # Return the filtered columns as a new DataFrame
+    return df[dv_columns]
