@@ -36,6 +36,35 @@ def cultivation_areaf(species, agemin, agemax, folderBDL, folder=""):
         areas[wiek] = dfw.area.sum()
     return areas
 
+# Function that returns the area of cultivation of a species within the age range in a given forest district as an array of length 200.
+def cultivation_volumef(species, agemin, agemax, folderBDL, folder=""):
+    """
+    Calculates the cultivation volume of a given tree species within a specified age range
+    in a given forest district based on data from the BDL folder.
+
+    :param species: Tree species code (str)
+    :param agemin: Minimum tree age (int)
+    :param agemax: Maximum tree age (int)
+    :param folderBDL: Name of the folder with BDL data (str)
+    :return: Array of length 200 with the cultivation area within the specified age range (np.ndarray)
+    """
+    bdl_subarea = pd.read_csv(folder + "/" + folderBDL + "/f_subarea.txt", sep='\t')
+    bdl_storey = pd.read_csv(folder + "/" + folderBDL + "/f_storey_species.txt", sep='\t')
+#    area = bdl_subarea.set_index('arodes_int_num')['sub_area'].to_dict()
+    bdl_storey = bdl_storey.fillna(0)
+    df = bdl_storey[
+        (bdl_storey.storey_cd.str.startswith("DRZEW")) 
+        & (bdl_storey.species_cd.str.startswith(species)) 
+        & (bdl_storey.volume > 0)]
+    df["volume_wydz"] = bdl_storey.volume
+#    df['part_cd_act'] = pd.to_numeric(df['part_cd_act'], errors='coerce')
+#    df["area"] = df["area_wydz"] * df["part_cd_act"] * 0.1
+    volumes = np.zeros(200)
+    for wiek in range(agemin, agemax):
+        dfw = df[df.species_age == wiek] 
+        volumes[wiek] = dfw.volume_wydz.mean()
+    return volumes
+
 # Function that returns a list of directories in the given folder f
 def list_directories(f):
     """
@@ -74,6 +103,36 @@ def cultivation_area(species, agemin, agemax, folder=""):
         for i in range(len(y)):
             y[i] += x[i]
     return y
+
+
+# Function that returns the area of cultivation of a species within the age range in the whole of Poland as an array of length 200.
+def cultivation_volume(species, agemin, agemax, folder=""):
+    """
+    Calculates the cultivation timber volume of a given tree species within a specified age range
+    for the whole of Poland based on data from multiple BDL folders.
+
+    :param species: Tree species code (str)
+    :param agemin: Minimum tree age (int)
+    :param agemax: Maximum tree age (int)
+    :return: Array of length 200 with the cultivation area within the specified age range (np.ndarray)
+    """
+    flist = list_directories(folder +"/")
+    n = len(flist)
+    y = cultivation_areaf(species, agemin, agemax, flist[0], folder)
+    n0 = np.zeros(200)
+    for f in tqdm(flist[1:], desc="Progress", unit="dir", ncols=100):
+        x = cultivation_volumef(species, agemin, agemax, f, folder)
+        
+        for i in range(len(y)):
+            if (x[i]> 1.0):    
+                y[i] += x[i]
+                n0[i] = n0[i]+1
+            
+    for i in range(len(y)):
+        if n0[i] > 0:
+            y[i] = y[i]/n0[i]
+    return y,n0
+
 
 # Function that smooths data using moving averages
 def smooth_data(data, window_size=10):

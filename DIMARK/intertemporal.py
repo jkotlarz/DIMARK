@@ -1,12 +1,5 @@
 # DIMARK/intertemporal.py
 
-from . import bdl as bdl
-import matplotlib.pyplot as plt
-
-# 'a' - matrix representing areas covered by species at specific ages
-# 'ro' - matrix representing the average density of wood volume per hectare for species at specific ages
-# 'h' - matrix representing the shares of areas covered by species at specific ages that are harvested
-
 def Mmultiple(a, b):
     """Element-wise multiplication of two matrices."""
     return [[a[x][y] * b[x][y] for y in range(len(a[0]))] for x in range(len(a))]
@@ -61,3 +54,32 @@ def area_prediction(area_t0, harvest, time=100):
         a.append(new_a)
         harvested.append(new_ch)
     return a, harvested  # Return the updated area matrices and harvested volumes over time
+
+
+def volume_prediction(t_area, density):
+    """
+    Predicts the wood volume based on area matrices and wood density.
+
+    Parameters:
+    t_area (list of lists): A list of matrices (2D lists) representing the area covered by different species of trees 
+                            for each year. Each element in the list `t_area[t]` is an area matrix for year `t`.
+    density (list of lists): A matrix (2D list) representing the average wood volume density per hectare for different 
+                             tree species at specific ages.
+
+    Returns:
+    t_volume (list of lists): A list of matrices (2D lists) representing the predicted wood volume for each year. 
+                              Each element in the list is a wood volume matrix for year `t`.
+    """
+    
+    t_volume = []  # Initialize an empty list to store the wood volume matrices for each year
+    
+    # Iterate over the years (indices) in the t_area list
+    for t in range(len(t_area)):
+        # Perform element-wise multiplication of the area matrix (t_area[t]) by the density matrix (density)
+        # The resulting matrix is appended to the t_volume list
+        t_volume.append(np.multiply(t_area[t], density))
+    
+    # Return the list of wood volume matrices
+
+
+def 
